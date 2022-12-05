@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	blockchain "github.com/rvmelkonian/slingshot-challenge/UniswapRouter"
-	factory "github.com/rvmelkonian/slingshot-challenge/UniswapRouter/factory"
+	factory "github.com/rvmelkonian/slingshot-challenge/UniswapRouter/UniswapFactory"
 )
 
 const (
@@ -52,7 +52,7 @@ func (r *RPCService) GetRate(ctx context.Context, tokenA, tokenB string) (*big.I
 	}
 
 	// create a new instance of the exchange contract
-	exchange, err := .NewUniswapV2Router02(exchangeAddr, r.ethClient)
+	exchange, err := blockchain.NewUniswapV2Router02(exchangeAddr, r.ethClient)
 	if err != nil {
 		return nil, err
 	}
