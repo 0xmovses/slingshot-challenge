@@ -6,10 +6,10 @@ import (
 	"log"
 	"math/big"
 
-	blockchain "github.com/rvmelkonian/slingshot-challenge/UniswapRouter"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	blockchain "github.com/rvmelkonian/slingshot-challenge/UniswapRouter"
+	factory "github.com/rvmelkonian/slingshot-challenge/UniswapRouter/factory"
 )
 
 const (
@@ -40,7 +40,7 @@ func NewRPCService(rpcURL string, uniswapAddr string) (*RPCService, error) {
 // GetRate returns the exchange rate for the giventoken pair
 func (r *RPCService) GetRate(ctx context.Context, tokenA, tokenB string) (*big.Int, error) {
 	// create a new instance of the Uniswap contract
-	uniswap, err := NewUniswapV2Factory(r.uniswapAddr, r.ethClient)
+	uniswap, err := factory.NewUniswapRouter(common.HexToAddress(r.uniswapAddr), r.ethClient)
 	if err != nil {
 		return nil, err
 	}
@@ -52,7 +52,7 @@ func (r *RPCService) GetRate(ctx context.Context, tokenA, tokenB string) (*big.I
 	}
 
 	// create a new instance of the exchange contract
-	exchange, err := blockchain.NewUniswapV2Router02(exchangeAddr, r.ethClient)
+	exchange, err := .NewUniswapV2Router02(exchangeAddr, r.ethClient)
 	if err != nil {
 		return nil, err
 	}
