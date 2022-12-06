@@ -1,15 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/rpc"
 )
-
-type Item struct {
-	Title string
-	Body  string
-}
 
 type Pair struct {
 	TokenA string
@@ -36,5 +30,4 @@ func main() {
 	if err = client.Call("RPC.GetRate", pair, &reply); err != nil {
 		log.Fatal("Error when calling GetRate() : ", err)
 	}
-	fmt.Printf("Rate : %v", reply)
 }

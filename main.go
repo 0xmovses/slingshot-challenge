@@ -46,7 +46,6 @@ func main() {
 func NewRPC(rpcURL string, uniswapAddr string) (*rpc_service.RPC, error) {
 	ethClient, err := ethclient.Dial(rpcURL)
 	if err != nil {
-		log.Fatal(err)
 		return nil, err
 	}
 
