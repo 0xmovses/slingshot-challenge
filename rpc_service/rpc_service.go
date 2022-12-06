@@ -93,9 +93,6 @@ func (r *RPC) GetRoute(ctx context.Context, tokenA common.Address, tokenB common
 	bestRates := make(map[common.Address]*big.Int)
 	bestRates[tokenA] = big.NewInt(1)
 
-	// create a map of the best routes for each token
-	//bestRoutes := make(map[common.Address][]common.Address)
-
 	bestRoute := Route{route: []common.Address{tokenA}, rate: big.NewInt(1)}
 
 	return &bestRoute, nil
