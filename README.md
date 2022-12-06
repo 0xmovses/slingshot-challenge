@@ -1,4 +1,4 @@
-###slinghsot-challenge
+## slinghsot-challenge
 
 An RPC Service for interacting with the Uniswap V2 Router, written in Go
 
@@ -11,7 +11,7 @@ Instructions to run
 - Then `go run main.go`
 The RPC service is now running and listening on port localhost:4040
 
-To run the tests run `go test -v` at the root of the project
+To run the tests, make sure the RPC service is running and in a seperate terminal run `go test -v` at the root of the project
 
 An example client has been written inside `/client`
 To run the client, which calls the RPC service methods navigate to `/client` and run `go run main.go`
