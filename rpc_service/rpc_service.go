@@ -1,82 +1,83 @@
 package rpc_service
 
 import (
-	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/rs/zerolog/log"
 	factory "github.com/rvmelkonian/slingshot-challenge/UniswapFactory"
 	router "github.com/rvmelkonian/slingshot-challenge/UniswapRouter"
 )
 
-type RPCService struct {
-	ethClient   *ethclient.Client
-	uniswapAddr string
+type RPC struct {
+	EthClient   *ethclient.Client
+	UniswapAddr string
 }
 
-func NewRPC(rpcURL string, uniswapAddr string) (*RPCService, error) {
-	// create a new Ethereum client
-	ethClient, err := ethclient.Dial(rpcURL)
-	if err != nil {
-		return nil, err
-	}
-
-	return &RPCService{
-		ethClient:   ethClient,
-		uniswapAddr: uniswapAddr,
-	}, nil
+type Pair struct {
+	TokenA string
+	TokenB string
 }
 
 // GetRate returns the exchange rate for the giventoken pair
-func (r *RPCService) GetRate(
-	ctx context.Context,
-	tokenA,
-	tokenB string,
-) (
-	*big.Int,
-	error,
-) {
-	if err := validateAddresses(tokenA, tokenB); err != nil {
-		return big.NewInt(0), err
+func (r *RPC) GetRate(pair Pair, reply *big.Int) error {
+	fmt.Println("GetRate called")
+	if err := validateAddresses(pair.TokenA, pair.TokenB); err != nil {
+		return err
 	}
 
 	factoryInstance, err := factory.NewUniswapFactoryCaller(
-		common.HexToAddress(r.uniswapAddr),
-		r.ethClient,
+		common.HexToAddress(r.UniswapAddr),
+		r.EthClient,
 	)
 	if err != nil {
-		return nil, err
+		log.Error()
+		return err
 	}
 
+	fmt.Println("factory initialized")
+
 	exchangeAddr, err := factoryInstance.GetPair(nil,
-		common.HexToAddress(tokenA),
-		common.HexToAddress(tokenB),
+		common.HexToAddress(pair.TokenA),
+		common.HexToAddress(pair.TokenB),
 	)
 	if err != nil {
-		return nil, err
+		fmt.Printf("Error : %s", err)
+		log.Error()
+		return err
 	}
+
+	fmt.Printf("exchange Address : %v", exchangeAddr)
 
 	routerInstance, err := router.NewUniswapRouterCaller(
 		exchangeAddr,
-		r.ethClient,
+		r.EthClient,
 	)
 	if err != nil {
-		return nil, err
+		log.Error()
+		return err
 	}
 
-	pair := []common.Address{
-		common.HexToAddress(tokenA),
-		common.HexToAddress(tokenB),
+	fmt.Println("router initialized")
+
+	path := []common.Address{
+		common.HexToAddress(pair.TokenA),
+		common.HexToAddress(pair.TokenB),
 	}
 
-	amountsOut, err := routerInstance.GetAmountsOut(nil, big.NewInt(1), pair)
+	amountsOut, err := routerInstance.GetAmountsOut(nil, big.NewInt(1), path)
 	if err != nil {
-		return nil, err
+		log.Error()
+		return err
 	}
+
+	fmt.Println("AmountsOut fetched from contract")
 
 	rate := new(big.Int).Div(amountsOut[0], amountsOut[1])
-	return rate, nil
+	reply = rate
+	return nil
 }
 
 func validateAddresses(tokenA, tokenB string) error {

@@ -1,21 +1,29 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net"
 	"net/http"
 	"net/rpc"
 	"os"
 
+	"github.com/ethereum/go-ethereum/ethclient"
+	"github.com/joho/godotenv"
 	"github.com/rvmelkonian/slingshot-challenge/rpc_service"
 )
 
-const uniswapAddr = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"
-
-var alchemyConnection = "https://eth-mainnet.ws.alchemyapi.io/v2/" + os.Getenv("ALCHEMY_API_KEY")
+const uniswapAddr = "0x5C69bEe701ef814a2B6a3EDD4B1652CB9cc5aA6f"
 
 func main() {
-	alchemyService, err := rpc_service.NewRPC(alchemyConnection, uniswapAddr)
+	if err := godotenv.Load(); err != nil {
+		log.Fatal("cannot load env")
+	}
+
+	var alchemyBaseUrl = "https://eth-mainnet.g.alchemy.com/v2/"
+	var alchemyConnection = alchemyBaseUrl + os.Getenv("ALCHEMY_API_KEY")
+
+	alchemyService, err := NewRPC(alchemyConnection, uniswapAddr)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -30,10 +38,20 @@ func main() {
 	if err != nil {
 		log.Fatal("Listener error", err)
 	}
-	log.Printf("serving rpc on port %d", 4040)
-	http.Serve(listener, nil)
 
+	fmt.Println("listening to RPC over localhost:4040 ... ")
+	http.Serve(listener, nil)
+}
+
+func NewRPC(rpcURL string, uniswapAddr string) (*rpc_service.RPC, error) {
+	ethClient, err := ethclient.Dial(rpcURL)
 	if err != nil {
-		log.Fatal("error serving: ", err)
+		log.Fatal(err)
+		return nil, err
 	}
+
+	return &rpc_service.RPC{
+		EthClient:   ethClient,
+		UniswapAddr: uniswapAddr,
+	}, nil
 }
