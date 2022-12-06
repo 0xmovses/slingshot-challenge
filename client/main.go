@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"math/big"
 	"net/rpc"
 )
 
@@ -18,15 +17,15 @@ type Pair struct {
 }
 
 const (
-	wethAddress = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-	usdtAddress = "0xdAC17F958D2ee523a2206206994597C13D831ec7"
+	wethAddr         = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+	uniswapTokenAddr = "0x1f9840a85d5aF5bf1D1762F925BDADdC4201F984"
 )
 
 func main() {
-	var reply big.Int
+	var reply float64
 	var pair = Pair{
-		TokenA: wethAddress,
-		TokenB: usdtAddress,
+		TokenA: wethAddr,
+		TokenB: uniswapTokenAddr,
 	}
 
 	client, err := rpc.DialHTTP("tcp", "localhost:4040")
